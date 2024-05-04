@@ -1,5 +1,4 @@
 import React, { useEffect } from "react"
-import iconTrashCan from '../assets/iconmonstr-trash-can-thin.svg.svg'
 
 
 interface Task {
@@ -40,6 +39,33 @@ function TaskListPage() {
         focusInput()
     }
 
+    function deleteTask(targetIndex: number) {
+        const newTaskList = taskList.filter((_, index) => index !== targetIndex)
+        updateTaskList(newTaskList)
+    }
+
+    function completeTask(targetIndex: number) {
+
+        const newTaskList: Task[] = []
+
+        // Re-create our task list. This is required for React to update the UI, otherwise our checkboxes won't update.
+        for (let i = 0; i < taskList.length; ++i) {
+            if (i === targetIndex) {
+                newTaskList.push({
+                    text: taskList[i].text,
+                    done: !taskList[i].done
+                })
+                continue
+            }
+            newTaskList.push({
+                text: taskList[i].text,
+                done: taskList[i].done
+            })
+        }
+        updateTaskList(newTaskList)
+    }
+
+
     // Focus on the input field when mounted
     useEffect(() => {
         focusInput()
@@ -54,8 +80,9 @@ function TaskListPage() {
                 <ul>
                     {taskList.map((task, index) => (
                         <li key={index}>
+                            {<input type='checkbox' id={'checkbox' + index} checked={task.done} onChange={() => completeTask(index)} />}
                             {task.text}
-                            {<button><img src={iconTrashCan} /></button>}
+                            {<button onClick={() => deleteTask(index)}><img src='/iconmonstr-trash-can-thin-16.png' /></button>}
                         </li>
                     ))}
                 </ul>
