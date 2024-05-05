@@ -92,7 +92,7 @@ input[type="checkbox"] {
     border: 1px solid #D3D3D3;
     border-radius: 2px;
     background-color: transparent;
-    background-image: url('./iconmonstr-check-mark-lined-240-white.png');
+    background-image: url('/iconmonstr-check-mark-lined-240-white.png');
     background-size: contain;
 }
 
