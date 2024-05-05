@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+import ToDoListSvg from '../assets/undraw_to_do_list_re_9nt7.svg';
 
 
 interface Task {
@@ -34,7 +35,7 @@ function TaskListPage() {
             text: inputValue,
             done: false,
         }
-        updateTaskList([...taskList, newTask])
+        updateTaskList([newTask, ...taskList])
         setInputValue('')
         focusInput()
     }
@@ -63,6 +64,11 @@ function TaskListPage() {
             })
         }
         updateTaskList(newTaskList)
+
+        setTimeout(() => {
+            deleteTask(targetIndex)
+        }, 4000);
+
     }
 
 
@@ -73,20 +79,31 @@ function TaskListPage() {
 
     return (
         <>
+
             <h1>Task List</h1>
-            <input type='text' placeholder="Enter a new task" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyDown} ref={inputRef} />
-            <button onClick={addTask} >Create</button>
-            <div>
-                <ul>
+
+            <div className='flex'>
+                <input className="textInput" type='text' placeholder="Enter a new task" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyDown} ref={inputRef} />
+                <button className='primary' disabled={inputValue.length === 0} onClick={addTask} >Create</button>
+            </div>
+            <div className="card flex center">
+                <ul className="flex1">
                     {taskList.map((task, index) => (
-                        <li key={index}>
-                            {<input type='checkbox' id={'checkbox' + index} checked={task.done} onChange={() => completeTask(index)} />}
-                            {task.text}
-                            {<button onClick={() => deleteTask(index)}><img src='/iconmonstr-trash-can-thin-16.png' /></button>}
+                        <li className="flex checkListItem" key={index}>
+                            <div className={task.done ? "checkboxInputChecked" : "checkboxInput"}>
+                                {<input type='checkbox' id={'checkbox' + index} checked={task.done} onChange={() => completeTask(index)} />}
+                            </div>
+                            <div className={task.done ? "flex1 alignLeft strikethru" : 'flex1 alignLeft'}>{task.text}</div>
+                            {<button className="link" onClick={() => deleteTask(index)}><img height='16px' src='/iconmonstr-trash-can-thin-240-white.png' /></button>}
                         </li>
                     ))}
                 </ul>
             </div>
+            {taskList.length === 0 && (
+                <div className="card center">
+                    <img src={ToDoListSvg} alt='empty task list'></img>
+                </div>
+            )}
         </>
     )
 }
