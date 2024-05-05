@@ -3,6 +3,7 @@ import ToDoListSvg from '../assets/undraw_to_do_list_re_9nt7.svg';
 
 
 interface Task {
+    id: string
     text: string
     done: boolean
 }
@@ -32,11 +33,12 @@ function TaskListPage() {
 
 
     function addTask() {
-        const newTask: Task = {
-            text: inputValue,
-            done: false,
-        }
         updateTaskList((prevTaskList) => {
+            const newTask: Task = {
+                id: prevTaskList.length + "-" + Date.now().toString(),
+                text: inputValue,
+                done: false,
+            }
             return [newTask, ...prevTaskList]
         })
         setInputValue('')
@@ -44,36 +46,46 @@ function TaskListPage() {
     }
 
     // Makes sure the correct task is deleted AND makes sure it doesn't get deleted when the user unchecks.
-    function deleteTask(task: Task) {
-        updateTaskList((prevTaskList) => {
-            const newTaskList = prevTaskList.filter((t) => {
-                if (t.text === task.text && t.done === true) {
-                    return false
-                }
-                return true
+    function deleteTaskDelay(task: Task) {
+        setTimeout(() => {
+            updateTaskList((prevTaskList) => {
+                return prevTaskList.filter((t) => {
+                    if (t.id === task.id && t.done === true) {
+                        return false
+                    }
+                    return true
+                });
             });
-            return newTaskList;
-        });
+        }, 4000)
     }
 
-    function completeTask(task: Task) {
-        const newTaskList: Task[] = []
-        const targetIndex = taskList.indexOf(task)
-        // Re-create our task list. This is required for React to update the UI, otherwise our checkboxes won't update.
-        for (let i = 0; i < taskList.length; ++i) {
-            if (i === targetIndex) {
+    function deleteTask(index: number) {
+        updateTaskList((prevTaskList) => {
+            return prevTaskList.filter((_, i) => i !== index)
+        })
+    }
+
+    function completeTask(index: number) {
+        updateTaskList((prevTaskList) => {
+            //Re-create our task list. This is required for React to update the UI, otherwise our checkboxes won't update.
+            const newTaskList: Task[] = []
+            for (let i = 0; i < prevTaskList.length; ++i) {
+                if (i === index) {
+                    newTaskList.push({
+                        id: prevTaskList[i].id,
+                        text: prevTaskList[i].text,
+                        done: !prevTaskList[i].done
+                    })
+                    continue
+                }
                 newTaskList.push({
-                    text: taskList[i].text,
-                    done: !taskList[i].done
+                    id: prevTaskList[i].id,
+                    text: prevTaskList[i].text,
+                    done: prevTaskList[i].done
                 })
-                continue
             }
-            newTaskList.push({
-                text: taskList[i].text,
-                done: taskList[i].done
-            })
-        }
-        updateTaskList(newTaskList)
+            return newTaskList
+        })
     }
 
 
@@ -85,7 +97,6 @@ function TaskListPage() {
 
     return (
         <>
-
             <h1>Task List</h1>
 
             <div className='flex'>
@@ -98,14 +109,13 @@ function TaskListPage() {
                         <li className='flex checkListItem' key={index}>
                             <div className={task.done ? 'checkboxInputChecked' : 'checkboxInput'}>
                                 {<input type='checkbox' id={'checkbox' + index} checked={task.done} onChange={() => {
-                                    completeTask(task)
-                                    setTimeout(() => {
-                                        deleteTask(task)
-                                    }, 4000)
+                                    console.log(task)
+                                    completeTask(index)
+                                    deleteTaskDelay(task)
                                 }} />}
                             </div>
                             <div className={task.done ? 'flex1 alignLeft strikethru' : 'flex1 alignLeft'}>{task.text}</div>
-                            {<button className='link' onClick={() => deleteTask(task)}><img height='16px' src='/iconmonstr-trash-can-thin-240-white.png' /></button>}
+                            {<button className='link' onClick={() => deleteTask(index)}><img height='16px' src='/iconmonstr-trash-can-thin-240-white.png' /></button>}
                         </li>
                     ))}
                 </ul>
