@@ -12,6 +12,7 @@ function TaskListPage() {
     const [taskList, updateTaskList] = React.useState<Task[]>([])
     const [inputValue, setInputValue] = React.useState('');
     const inputRef = React.useRef<HTMLInputElement>(null);
+    // const deletedRef = React.useRef<number[]>([])
 
     function focusInput() {
         if (inputRef.current) {
@@ -35,20 +36,29 @@ function TaskListPage() {
             text: inputValue,
             done: false,
         }
-        updateTaskList([newTask, ...taskList])
+        updateTaskList((prevTaskList) => {
+            return [newTask, ...prevTaskList]
+        })
         setInputValue('')
         focusInput()
     }
 
-    function deleteTask(targetIndex: number) {
-        const newTaskList = taskList.filter((_, index) => index !== targetIndex)
-        updateTaskList(newTaskList)
+    // Makes sure the correct task is deleted AND makes sure it doesn't get deleted when the user unchecks.
+    function deleteTask(task: Task) {
+        updateTaskList((prevTaskList) => {
+            const newTaskList = prevTaskList.filter((t) => {
+                if (t.text === task.text && t.done === true) {
+                    return false
+                }
+                return true
+            });
+            return newTaskList;
+        });
     }
 
-    function completeTask(targetIndex: number) {
-
+    function completeTask(task: Task) {
         const newTaskList: Task[] = []
-
+        const targetIndex = taskList.indexOf(task)
         // Re-create our task list. This is required for React to update the UI, otherwise our checkboxes won't update.
         for (let i = 0; i < taskList.length; ++i) {
             if (i === targetIndex) {
@@ -64,11 +74,6 @@ function TaskListPage() {
             })
         }
         updateTaskList(newTaskList)
-
-        setTimeout(() => {
-            deleteTask(targetIndex)
-        }, 4000);
-
     }
 
 
@@ -76,6 +81,7 @@ function TaskListPage() {
     useEffect(() => {
         focusInput()
     }, []);
+
 
     return (
         <>
@@ -91,10 +97,15 @@ function TaskListPage() {
                     {taskList.map((task, index) => (
                         <li className='flex checkListItem' key={index}>
                             <div className={task.done ? 'checkboxInputChecked' : 'checkboxInput'}>
-                                {<input type='checkbox' id={'checkbox' + index} checked={task.done} onChange={() => completeTask(index)} />}
+                                {<input type='checkbox' id={'checkbox' + index} checked={task.done} onChange={() => {
+                                    completeTask(task)
+                                    setTimeout(() => {
+                                        deleteTask(task)
+                                    }, 4000)
+                                }} />}
                             </div>
                             <div className={task.done ? 'flex1 alignLeft strikethru' : 'flex1 alignLeft'}>{task.text}</div>
-                            {<button className='link' onClick={() => deleteTask(index)}><img height='16px' src='/iconmonstr-trash-can-thin-240-white.png' /></button>}
+                            {<button className='link' onClick={() => deleteTask(task)}><img height='16px' src='/iconmonstr-trash-can-thin-240-white.png' /></button>}
                         </li>
                     ))}
                 </ul>
