@@ -44,7 +44,7 @@ class TaskListPage extends Component<Record<string, Task[]>, State> {
     addTask = () => {
 
         const newTask: Task = {
-            id: this.state.taskList.length + "-" + Date.now().toString(),
+            id: this.state.taskList.length + '-' + Date.now().toString(),
             text: this.state.inputValue,
             done: false,
         }
@@ -107,7 +107,6 @@ class TaskListPage extends Component<Record<string, Task[]>, State> {
                             <li className='flex checkListItem' key={index}>
                                 <div className={task.done ? 'checkboxInputChecked' : 'checkboxInput'}>
                                     {<input type='checkbox' id={'checkbox' + index} checked={task.done} onChange={() => {
-                                        console.log(task)
                                         this.completeTask(index)
                                         this.deleteTaskDelay(task)
                                     }} />}
