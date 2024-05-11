@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import ToDoListSvg from '../assets/undraw_to_do_list_re_9nt7.svg';
+import NoTasksYet from '../components/NoTasksYet';
+import NewTaskBar from '../components/NewTaskBar';
+
 
 
 interface Task {
@@ -92,12 +94,13 @@ class TaskListPage extends Component<Record<string, Task[]>, State> {
         return (
             <>
                 <h1>Task List</h1>
+                <NewTaskBar
+                    inputValue={this.state.inputValue}
+                    addTask={this.addTask}
+                    handleInputChange={this.handleInputChange}
+                    handleKeyDown={this.handleKeyDown}
+                />
 
-                <div className='flex'>
-                    {/* ref={this.inputRef} */}
-                    <input className='textInput' id='textInput' type='text' placeholder='Enter a new task' value={this.state.inputValue} onChange={this.handleInputChange} onKeyDown={this.handleKeyDown} />
-                    <button className='primary' disabled={this.state.inputValue.length === 0} onClick={this.addTask} >Create</button>
-                </div>
                 <div className='card flex center'>
                     <ul className='flex1'>
                         {this.state.taskList.map((task, index) => (
@@ -116,9 +119,7 @@ class TaskListPage extends Component<Record<string, Task[]>, State> {
                     </ul>
                 </div>
                 {this.state.taskList.length === 0 && (
-                    <div className='card center'>
-                        <img src={ToDoListSvg} alt='empty task list'></img>
-                    </div>
+                    <NoTasksYet />
                 )}
             </>
         )
